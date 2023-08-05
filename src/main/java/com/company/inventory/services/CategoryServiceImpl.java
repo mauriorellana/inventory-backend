@@ -95,6 +95,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
 
 	@Override
+	@Transactional
 	public ResponseEntity<CategoryResponseRest> update(Category category, Long id) {
 		
 		CategoryResponseRest response = new CategoryResponseRest();
@@ -122,6 +123,24 @@ public class CategoryServiceImpl implements ICategoryService {
 		}else {
 			response.setMetadata("Respuesta Fallida", "-1", "Categoria no encomtrada");
 			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
+	}
+
+
+	@Override
+	public ResponseEntity<CategoryResponseRest> deleteById(Long id) {
+		
+CategoryResponseRest response = new CategoryResponseRest();
+		
+		try{
+			categoryDao.deleteById(id);
+			response.setMetadata("Respuesta ok", "00", "Categoria eliminada");
+			
+		}catch(Exception e) {
+			response.setMetadata("Respuesta fallida", "-1", "Error al consultar");
+			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
