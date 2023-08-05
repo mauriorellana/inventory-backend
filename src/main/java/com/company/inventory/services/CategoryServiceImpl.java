@@ -70,5 +70,62 @@ public class CategoryServiceImpl implements ICategoryService {
 		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
 	}
 
+
+	@Override
+	@Transactional(readOnly=false)
+	public ResponseEntity<CategoryResponseRest> save(Category category) {
+		
+		CategoryResponseRest response = new CategoryResponseRest();
+		List<Category> list = new ArrayList<Category>();
+		
+		Category categorySaved = categoryDao.save(category);
+		
+		if(categorySaved != null) {
+			
+			list.add(categorySaved);
+			response.getCategoryResponse().setCategory(list);
+			response.setMetadata("Respuesta OK", "00", "Categoria Creada");
+		}else {
+			response.setMetadata("Respuesta Fallida", "-1", "Categoria no creada");
+			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.BAD_REQUEST);
+		}
+		
+		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
+	}
+
+
+	@Override
+	public ResponseEntity<CategoryResponseRest> update(Category category, Long id) {
+		
+		CategoryResponseRest response = new CategoryResponseRest();
+		List<Category> list = new ArrayList<Category>();
+		
+		Optional<Category> categorySearch = categoryDao.findById(id);
+		
+		if(categorySearch.isPresent()) {
+			//Se procede a actualizar
+			
+			categorySearch.get().setName(category.getName());
+			categorySearch.get().setDescription(category.getDescription());
+			
+			Category categoryToUpdate = categoryDao.save(categorySearch.get());
+			
+			if(categoryToUpdate != null) {
+				list.add(categoryToUpdate);
+				response.getCategoryResponse().setCategory(list);
+				response.setMetadata("Respuesta OK", "00", "Categoria actualizada");
+			}else {
+				response.setMetadata("Respuesta Fallida", "-1", "Categoria no actualizada");
+				return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.BAD_REQUEST);
+			}
+			
+		}else {
+			response.setMetadata("Respuesta Fallida", "-1", "Categoria no encomtrada");
+			return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<CategoryResponseRest>(response, HttpStatus.OK);
+	}
+
 	
 }
